@@ -22,6 +22,9 @@ const app = express();
 app.set('view engine','ejs');
 app.set('views', path.join(__dirname,'views'))
 
+// Request body
+app.use(express.urlencoded({extended: true}))
+
 app.get('/', (req, res) => {
     res.render('home')
 })
@@ -32,10 +35,23 @@ app.get('/campgrounds', async (req, res) => {
     res.render('campgrounds/index', {campgrounds});
 })
 
+// Route for /campgrounds/new
+app.get('/campgrounds/new', (req, res) => {
+    res.render('campgrounds/new');
+})
+
 // Route for /campgrounds/:id
 app.get('/campgrounds/:id', async (req, res) => {
     const campground = await Campground.findById(req.params.id)
     res.render('campgrounds/show', {campground});
+})
+
+// Post route for /campgrounds
+// Redirect back to /campgrounds/:id after post
+app.post('/campgrounds', async (req, res) => {
+    const campground = new Campground(req.body.campground);
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`)
 })
 
 app.listen(3000, () => {
