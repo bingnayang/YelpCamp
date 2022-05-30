@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const ejsMate = require('ejs-mate')
-const { campgroundSchema } = require('./schema.js');
+const { campgroundSchema, reviewSchema } = require('./schema.js');
 const catchAsync = require('./utils/catchAsync');
 const expressError = require('./utils/ExpressError');
 const Campground = require('./models/campground');
@@ -32,9 +32,21 @@ app.set('views', path.join(__dirname,'views'))
 app.use(express.urlencoded({extended: true}))// Request body
 app.use(methodOverride('_method'))
 
-// JOI Validation Middleware Function
+// JOI Validation Middleware Function for Campground
 const validateCampground = (req,res,next) =>{
     const { error } = campgroundSchema.validate(req.body);
+    
+    if(error){
+        const msg = error.details.map(el => el.message).join(',')
+        throw new expressError(msg, 400)
+    }else{
+        next();
+    }
+}
+
+// JOI Validation Middleware Function for Review
+const validateReview = (req,res,next) =>{
+    const { error } = reviewSchema.validate(req.body);
     
     if(error){
         const msg = error.details.map(el => el.message).join(',')
@@ -95,7 +107,7 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
 }))
 
 // Route for post review
-app.post('/campgrounds/:id/reviews', catchAsync(async(req,res) => {
+app.post('/campgrounds/:id/reviews',validateReview, catchAsync(async(req,res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
     campground.reviews.push(review);
