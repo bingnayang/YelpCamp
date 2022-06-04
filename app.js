@@ -9,6 +9,7 @@ const methodOverride = require('method-override');
 const Review = require('./models/review');
 
 const campgrounds = require('./routes/campgrounds');
+const reviews = require('./routes/reviews');
 
 
 // Connect mongoose and check for error
@@ -61,29 +62,12 @@ const validateReview = (req,res,next) =>{
 
 // Use campgrounds routes
 app.use('/campgrounds',campgrounds);
-
+// Use reviews routes
+app.use('/campgrounds/:id/reviews',reviews);
 
 app.get('/', (req, res) => {
     res.render('home')
 })
-
-// Route for post review
-app.post('/campgrounds/:id/reviews',validateReview, catchAsync(async(req,res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-}))
-
-// Route for delete review
-app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req,res) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}})
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}))
 
 // Express Error class error handler
 app.all('*', (req, res, next) => {
