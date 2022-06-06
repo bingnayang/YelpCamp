@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const ejsMate = require('ejs-mate')
 const session = require('express-session');
+const flash = require('connect-flash');
 const { campgroundSchema, reviewSchema } = require('./schema.js');
 const catchAsync = require('./utils/catchAsync');
 const expressError = require('./utils/ExpressError');
@@ -39,6 +40,7 @@ app.use(express.urlencoded({extended: true}))// Request body
 app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname,'public')));
 
+// Configuring session
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret',
     resave: false,
@@ -50,6 +52,16 @@ const sessionConfig = {
     }
 }
 app.use(session(sessionConfig));
+
+app.use(flash());
+
+// Middleware for flash
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error')
+
+    next();
+})
 
 // Use campgrounds routes
 app.use('/campgrounds',campgrounds);
