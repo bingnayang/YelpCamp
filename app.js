@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const ejsMate = require('ejs-mate')
+const session = require('express-session');
 const { campgroundSchema, reviewSchema } = require('./schema.js');
 const catchAsync = require('./utils/catchAsync');
 const expressError = require('./utils/ExpressError');
@@ -38,29 +39,17 @@ app.use(express.urlencoded({extended: true}))// Request body
 app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname,'public')));
 
-// JOI Validation Middleware Function for Campground
-const validateCampground = (req,res,next) =>{
-    const { error } = campgroundSchema.validate(req.body);
-    
-    if(error){
-        const msg = error.details.map(el => el.message).join(',')
-        throw new expressError(msg, 400)
-    }else{
-        next();
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
-
-// JOI Validation Middleware Function for Review
-const validateReview = (req,res,next) =>{
-    const { error } = reviewSchema.validate(req.body);
-    
-    if(error){
-        const msg = error.details.map(el => el.message).join(',')
-        throw new expressError(msg, 400)
-    }else{
-        next();
-    }
-}
+app.use(session(sessionConfig));
 
 // Use campgrounds routes
 app.use('/campgrounds',campgrounds);
