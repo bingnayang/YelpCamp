@@ -10,6 +10,10 @@ const Campground = require('./models/campground');
 const methodOverride = require('method-override');
 const Review = require('./models/review');
 
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
+
 const campgrounds = require('./routes/campgrounds');
 const reviews = require('./routes/reviews');
 
@@ -52,8 +56,14 @@ const sessionConfig = {
     }
 }
 app.use(session(sessionConfig));
-
 app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // Middleware for flash
 app.use((req, res, next) => {
@@ -61,6 +71,13 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error')
 
     next();
+})
+
+// Fake and will delete
+app.get('/fakeUser', async(req,res) => {
+    const user = new User({email: 'jay123@email.com', username:'jay123'})
+    const newUser = await User.register(user,'shrimp')
+    res.send(newUser)
 })
 
 // Use campgrounds routes
