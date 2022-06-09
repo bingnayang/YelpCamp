@@ -14,8 +14,9 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 
-const campgrounds = require('./routes/campgrounds');
-const reviews = require('./routes/reviews');
+const usersRoutes = require('./routes/users');
+const campgroundsRoutes = require('./routes/campgrounds');
+const reviewsRoutes = require('./routes/reviews');
 
 
 // Connect mongoose and check for error
@@ -73,17 +74,12 @@ app.use((req, res, next) => {
     next();
 })
 
-// Fake and will delete
-app.get('/fakeUser', async(req,res) => {
-    const user = new User({email: 'jay123@email.com', username:'jay123'})
-    const newUser = await User.register(user,'shrimp')
-    res.send(newUser)
-})
-
+// Use users routes
+app.use('/', usersRoutes)
 // Use campgrounds routes
-app.use('/campgrounds',campgrounds);
+app.use('/campgrounds',campgroundsRoutes);
 // Use reviews routes
-app.use('/campgrounds/:id/reviews',reviews);
+app.use('/campgrounds/:id/reviews',reviewsRoutes);
 
 app.get('/', (req, res) => {
     res.render('home')
