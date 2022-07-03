@@ -14,11 +14,8 @@ const {isLoggedIn, isAuthor, validateCampground} = require('../middleware');
 // Post route for /campgrounds, Redirect back to /campgrounds/:id after post
 router.route('/')
     .get(catchAsync(campgrounds.index))
-    // .post(isLoggedIn,validateCampground, catchAsync(campgrounds.createCampground))
-    .post(upload.array('image'), (req, res, next) =>{
-        console.log(req.body, req.files)
-        res.send("It Worked");
-    })
+    .post(isLoggedIn, upload.array('image'), validateCampground, catchAsync(campgrounds.createCampground))
+
 
 // Route for /campgrounds/new
 router.get('/new', isLoggedIn, campgrounds.renderNewForm)
