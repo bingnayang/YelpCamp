@@ -28,9 +28,18 @@ const seedDB = async () => {
             author: '62a525dacbc00eefaf9d7dd6',
             location: `${cities[random1000].city}`,
             title: `${sample(descriptors)} ${sample(places)}`,
-            image: `https://source.unsplash.com/collection/483251`,
             description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.`,
-            price
+            price,
+            images: [
+                {
+                    url:'https://res.cloudinary.com/dgz0byy28/image/upload/v1656808814/YelpCamp/trbg0coymuoglqwomwke.jpg',
+                    filename: 'YelpCamp/trbg0coymuoglqwomwke'
+                },
+                {
+                    url: 'https://res.cloudinary.com/dgz0byy28/image/upload/v1656808814/YelpCamp/m6yidjhfk2vagony0lxb.jpg',
+                    filename: 'YelpCamp/m6yidjhfk2vagony0lxb'
+                }
+            ]
         })
         await camp.save();
     }
