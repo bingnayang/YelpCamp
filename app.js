@@ -21,11 +21,14 @@ const User = require('./models/user');
 const usersRoutes = require('./routes/users');
 const campgroundsRoutes = require('./routes/campgrounds');
 const reviewsRoutes = require('./routes/reviews');
+const { default: mongoose } = require('mongoose');
 
+const dbUrl = process.env.DB_URL;
 
 // Connect mongoose and check for error
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/yelp-camp',{
+// const mongoose = require('mongoose');
+// mongoose.connect('mongodb://localhost:27017/yelp-camp',{
+mongoose.connect(dbUrl,{
     // useNewUrlParser: true,
     // useCreateIndex: true,
     // useUnifiedTopology: true
